@@ -1,2 +1,2 @@
 modules:
-    enabled: [controller, cloudhub]
+    enabled: [controller, cloudhub, http_router]
