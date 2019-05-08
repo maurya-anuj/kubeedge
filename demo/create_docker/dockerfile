@@ -1,0 +1,9 @@
+FROM demo-docker:1
+
+USER root
+RUN mkdir -p home/face_recognition
+# RUN mkdir -p home/face_recognition/data
+WORKDIR /home/face_recognition
+COPY datacreate.py /home/face_recognition
+
+CMD [ "python", "/home/face_recognition/datacreate.py" ]

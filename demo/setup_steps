@@ -1,0 +1,28 @@
+Steps:
+> Start K8s cluster
+	-kubeadm init 
+	-add insecure-port and bind-address
+> make master node ready.
+	-you can use this commands for that:
+	  -kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml 
+	  -kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+
+> Check certificates to be same for both edgecontroller and edge node
+> run command: `xhost local:user` on both master and edge
+> Set ip of master in edgecontroller.yaml to connect it to K8s master
+> Run edgecontroller
+> Set ip of cloudhub in edge.yaml to connect edgehub to cloudhub
+> Run edge_core
+> Check deployment image is available
+> Remove NoSchedule taint of master node
+	-kubectl taint nodes $(hostname) node-role.kubernetes.io/master:NoSchedule-
+> Set the node lable to apply the deployment on particular nodes
+	-kubectl label nodes name_of_your_node dedicated=master
+	-kubectl label nodes name_of_your_node dedicated=edge
+> Deploy application.
+	-kubectl apply -f $GOPATH/src/github.com/kubeedge/kubeedge/demo/create.yaml
+
+
+Note:
+> Container port on node deployment is same as port of server running inside its app:8000.
+> http route starts a server at 8001. where master app posts requests.
