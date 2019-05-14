@@ -1,4 +1,5 @@
-loggerLevel: "DEBUG"
+loggerLevel: "ERROR"
 enableRsyslog: false
 logFormatText: true
-writers: [stdout]
+writers: [stdout, file]
+loggerFile: "edge.log"

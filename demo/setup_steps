@@ -19,10 +19,17 @@ Steps:
 > Set the node lable to apply the deployment on particular nodes
 	-kubectl label nodes name_of_your_node dedicated=master
 	-kubectl label nodes name_of_your_node dedicated=edge
+> Check deployment yaml file for:
+	-image name that is deployed
+	-volume mount path of "data" folder
+	-container and host port
+	-nodeSelector to the label of node you plan to apply the deployment to.
 > Deploy application.
-	-kubectl apply -f $GOPATH/src/github.com/kubeedge/kubeedge/demo/create.yaml
+	-kubectl apply -f $GOPATH/src/github.com/maurya-anuj/fr_demo/demo/create.yaml
+	-kubectl apply -f $GOPATH/src/github.com/maurya-anuj/fr_demo/demo/recog.yaml
 
 
 Note:
 > Container port on node deployment is same as port of server running inside its app:8000.
 > http route starts a server at 8001. where master app posts requests.
+> You might have to wait betweet two flannel commands to make master ready.
