@@ -78,7 +78,7 @@ $1 $2
 cloudhub:
   address: 0.0.0.0
   port: 10000
-  ca: /etc/kubeedge/ca/rootCA.crt
+  ca: /etc/kubeedge/certs/rootCA.crt
   cert: /etc/kubeedge/certs/edge.crt
   key: /etc/kubeedge/certs/edge.key
   keepalive-interval: 30
@@ -103,6 +103,6 @@ loggerFile: "edgecontroller.log"
 `)
 
 	ControllerModulesYaml = []byte(`modules:
-    enabled: [devicecontroller, controller, cloudhub]
+    enabled: [devicecontroller, controller, cloudhub, http_router]
 `)
 )

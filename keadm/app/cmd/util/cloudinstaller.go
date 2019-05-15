@@ -17,18 +17,20 @@ type KubeCloudInstTool struct {
 	Common
 }
 
+const hostname = "master"
+
 //InstallTools downloads KubeEdge for the specified version
 //and makes the required configuration changes and initiates edgecontroller.
 func (cu *KubeCloudInstTool) InstallTools() error {
 	cu.SetOSInterface(GetOSInterface())
 	cu.SetKubeEdgeVersion(cu.ToolVersion)
 
-	//err := cu.InstallKubeEdge()
-	//if err != nil {
-	//	return err
-	//}
+	err := cu.InstallKubeEdge()
+	if err != nil {
+		return err
+	}
 
-	err := cu.xhost()
+	err = cu.xhostandhostname()
 	if err != nil {
 		return err
 	}
@@ -60,11 +62,13 @@ func (cu *KubeCloudInstTool) InstallTools() error {
 		return err
 	}
 	fmt.Println("cloningdemo")
-	//err=cu.cloningdemo()
-	//if err != nil {
-	//	return err
-	//}
-	//fmt.Println("cloningdemo")
+
+	err=cu.copycerts()
+	if err != nil {
+		return err
+	}
+	fmt.Println("cloningdemo")
+
 	err=cu.makemasterready()
 	if err != nil {
 		return err
@@ -136,6 +140,8 @@ func (cu *KubeCloudInstTool)clonebeehive() error {
 	return nil
 }
 
+
+
 func (cu *KubeCloudInstTool)cloningkubeedge() error {
 	err := os.MkdirAll("/home/src/github.com/kubeedge",0666)
 	if err != nil {
@@ -144,28 +150,19 @@ func (cu *KubeCloudInstTool)cloningkubeedge() error {
 
 	}
 	if _, err := os.Stat("/home/src/github.com/kubeedge/kubeedge"); os.IsNotExist(err) {
-	}else {
-		cmd := &Command{Cmd: exec.Command("sh", "-c", "rm -rf /home/src/github.com/kubeedge/kubeedge")}
+		fmt.Println("befor cloning")
+		cmd := &Command{Cmd: exec.Command("sh", "-c", " cd /home/src/github.com/kubeedge && git clone https://github.com/maurya-anuj/kubeedge.git -b demo2")}
 		err = cmd.ExecuteCmdShowOutput()
 		errout := cmd.GetStdErr()
 		if err != nil || errout != "" {
 			fmt.Println("in error")
 			return fmt.Errorf("%s", errout)
-
 		}
-	}
-	//time.Sleep(1 * time.Second)
-	//put one check whether
-	cmd := &Command{Cmd: exec.Command("sh", "-c", "cd /home/src/github.com/kubeedge && git clone https://github.com/kubeedge/kubeedge.git")}
-	err = cmd.ExecuteCmdShowOutput()
-	errout := cmd.GetStdErr()
-	if err != nil || errout != "" {
-		fmt.Println("in error")
-		return fmt.Errorf("%s", errout)
 
 	}
 	return nil
 }
+
 func (cu *KubeCloudInstTool)cloningdemo() error {
 	if _, err := os.Stat("/home/src/fr_demo"); os.IsNotExist(err) {
 		cmd := &Command{Cmd: exec.Command("sh", "-c", "cd /home/src && git clone https://github.com/maurya-anuj/fr_demo.git")}
@@ -178,23 +175,34 @@ func (cu *KubeCloudInstTool)cloningdemo() error {
 		}
 	}
 
-	cmd := &Command{Cmd: exec.Command("sh", "-c", "cp -r /home/src/fr_demo/http_router /home/src/github.com/kubeedge/kubeedge/cloud/pkg")}
+	//cmd := &Command{Cmd: exec.Command("sh", "-c", "cp -rf /home/src/fr_demo/http_router /home/src/github.com/kubeedge/kubeedge/cloud/pkg")}
+	//err := cmd.ExecuteCmdShowOutput()
+	//errout := cmd.GetStdErr()
+	//if err != nil || errout != "" {
+	//	fmt.Println("in error")
+	//	return fmt.Errorf("%s", errout)
+	//
+	//}
+	//cmd = &Command{Cmd: exec.Command("sh", "-c", "sed -i 's|enabled: .*|enabled: [devicecontroller, controller, cloudhub, http_router]|g' /home/src/github.com/kubeedge/kubeedge/cloud/conf/modules.yaml")}
+	//err = cmd.ExecuteCmdShowOutput()
+	//errout = cmd.GetStdErr()
+	//if err != nil || errout != "" {
+	//	fmt.Println("in error")
+	//	return fmt.Errorf("%s", errout)
+	//
+	//}
+	//
+	//return nil
+}
+
+func (cu *KubeCloudInstTool)copycerts() error {
+	cmd := &Command{Cmd: exec.Command("sh", "-c", "cp -rf /home/src/fr_demo/certs /etc/kubeedge/")}
 	err := cmd.ExecuteCmdShowOutput()
 	errout := cmd.GetStdErr()
 	if err != nil || errout != "" {
 		fmt.Println("in error")
 		return fmt.Errorf("%s", errout)
-
 	}
-	cmd = &Command{Cmd: exec.Command("sh", "-c", "sed -i 's|enabled: .*|enabled: [devicecontroller, controller, cloudhub, http_router]|g' /home/src/github.com/kubeedge/kubeedge/cloud/conf/modules.yaml")}
-	err = cmd.ExecuteCmdShowOutput()
-	errout = cmd.GetStdErr()
-	if err != nil || errout != "" {
-		fmt.Println("in error")
-		return fmt.Errorf("%s", errout)
-
-	}
-
 	return nil
 }
 
@@ -228,6 +236,13 @@ func (cu *KubeCloudInstTool) updateManifests() error {
 	}
 
 	ioutil.WriteFile(KubeCloudApiserverYamlPath, []byte(fileContent), 0644)
+
+	if err = ioutil.WriteFile(KubeEdgeControllerYaml, ControllerYaml, 0666); err != nil {
+		return err
+	}
+	if err = ioutil.WriteFile(KubeEdgeControllerModulesYaml,ControllerModulesYaml, 0666); err != nil {
+		return err
+	}
 	return nil
 
 }
@@ -253,10 +268,43 @@ func linesFromReader(r io.Reader) ([]string, error) {
 
 	return lines, nil
 }
-
-//RunEdgeController starts edgecontroller process
+//
+////RunEdgeController starts edgecontroller process
+//func (cu *KubeCloudInstTool) RunEdgeController() error {
+//
+//	cmd := &Command{Cmd: exec.Command("sh", "-c", "cd /home/src/github.com/kubeedge/kubeedge && make all WHAT=cloud")}
+//	err := cmd.ExecuteCmdShowOutput()
+//	errout := cmd.GetStdErr()
+//	if err != nil || errout != "" {
+//		fmt.Println("in error")
+//		return fmt.Errorf("%s", errout)
+//
+//	}
+//
+//	cmd = &Command{Cmd: exec.Command("sh", "-c", "cp /home/src/github.com/kubeedge/kubeedge/cloud/edgecontroller /etc/kubeedge/kubeedge/cloud/")}
+//	err = cmd.ExecuteCmdShowOutput()
+//	errout = cmd.GetStdErr()
+//	if err != nil || errout != "" {
+//		fmt.Println("in error")
+//		return fmt.Errorf("%s", errout)
+//
+//	}
+//
+//	binExec := fmt.Sprintf("cd  chmod +x edgecontroller && ./edgecontroller > %s/kubeedge/cloud/%s.log 2>&1 &", KubeEdgePath, KubeCloudBinaryName)
+//	cmd = &Command{Cmd: exec.Command("sh", "-c", binExec)}
+//	cmd.Cmd.Env = os.Environ()
+//	env := fmt.Sprintf("GOARCHAIUS_CONFIG_PATH=%skubeedge/cloud", KubeEdgePath)
+//	cmd.Cmd.Env = append(cmd.Cmd.Env, env)
+//	err = cmd.ExecuteCmdShowOutput()
+//	errout = cmd.GetStdErr()
+//	if err != nil || errout != "" {
+//		return fmt.Errorf("%s", errout)
+//	}
+//	fmt.Println(cmd.GetStdOutput())
+//	fmt.Println("KubeEdge controller is running, For logs visit", KubeEdgePath+"cloud/")
+//	return nil
+//}
 func (cu *KubeCloudInstTool) RunEdgeController() error {
-
 	cmd := &Command{Cmd: exec.Command("sh", "-c", "cd /home/src/github.com/kubeedge/kubeedge && make all WHAT=cloud")}
 	err := cmd.ExecuteCmdShowOutput()
 	errout := cmd.GetStdErr()
@@ -266,7 +314,25 @@ func (cu *KubeCloudInstTool) RunEdgeController() error {
 
 	}
 
-	cmd = &Command{Cmd: exec.Command("sh", "-c", "cp /home/src/github.com/kubeedge/kubeedge/cloud/edgecontroller /etc/kubeedge/kubeedge/cloud/")}
+	//cmd = &Command{Cmd: exec.Command("sh", "-c", "cp -rf /home/src/github.com/kubeedge/kubeedge/cloud/edgecontroller /etc/kubeedge/kubeedge/cloud/")}
+	//err = cmd.ExecuteCmdShowOutput()
+	//errout = cmd.GetStdErr()
+	//if err != nil || errout != "" {
+	//	fmt.Println("in error")
+	//	return fmt.Errorf("%s", errout)
+	//
+	//}
+	time.Sleep(1*time.Second)
+	//filetoCopy := fmt.Sprintf("cp -rf %s/kubeedge/cloud/%s /usr/local/bin/", KubeEdgePath, KubeCloudBinaryName)
+	//cmd = &Command{Cmd: exec.Command("sh", "-c", filetoCopy)}
+	//err = cmd.ExecuteCmdShowOutput()
+	//errout = cmd.GetStdErr()
+	//if err != nil || errout != "" {
+	//	fmt.Println("in error")
+	//	return fmt.Errorf("%s", errout)
+	//
+	//}
+	cmd = &Command{Cmd: exec.Command("sh", "-c", "export PATH=$PATH:/home/src/github.com/kubeedge/kubeedge/cloud")}
 	err = cmd.ExecuteCmdShowOutput()
 	errout = cmd.GetStdErr()
 	if err != nil || errout != "" {
@@ -275,7 +341,7 @@ func (cu *KubeCloudInstTool) RunEdgeController() error {
 
 	}
 
-	binExec := fmt.Sprintf("chmod +x /usr/local/bin/%s && %s > %s/kubeedge/cloud/%s.log 2>&1 &", KubeCloudBinaryName, KubeCloudBinaryName, KubeEdgePath, KubeCloudBinaryName)
+	binExec := fmt.Sprintf("chmod +x /home/src/github.com/kubeedge/kubeedge/cloud/%s && %s > /home/src/github.com/kubeedge/kubeedge/cloud/%s.log 2>&1 &", KubeCloudBinaryName, KubeCloudBinaryName,  KubeCloudBinaryName)
 	cmd = &Command{Cmd: exec.Command("sh", "-c", binExec)}
 	cmd.Cmd.Env = os.Environ()
 	env := fmt.Sprintf("GOARCHAIUS_CONFIG_PATH=%skubeedge/cloud", KubeEdgePath)
@@ -286,7 +352,7 @@ func (cu *KubeCloudInstTool) RunEdgeController() error {
 		return fmt.Errorf("%s", errout)
 	}
 	fmt.Println(cmd.GetStdOutput())
-	fmt.Println("KubeEdge controller is running, For logs visit", KubeEdgePath+"cloud/")
+	fmt.Println("KubeEdge controller is running, For logs visit", KubeEdgePath + "cloud/")
 	return nil
 }
 
@@ -310,19 +376,26 @@ func (cu *KubeCloudInstTool) TearDown() error {
 	return nil
 }
 
-func (cu *KubeCloudInstTool) xhost() error {
+func (cu *KubeCloudInstTool) xhostandhostname() error {
 	cmd := &Command{Cmd: exec.Command("sh", "-c", "xhost +local:user:root")}
 	err := cmd.ExecuteCmdShowOutput()
 	errout := cmd.GetStdErr()
 	if err != nil || errout != "" {
 		fmt.Println("in error")
 		return fmt.Errorf("%s", errout)
-
+	}
+	cmd = &Command{Cmd: exec.Command("sh", "-c", fmt.Sprintf("hostnamectl set-hostname %s", hostname))}
+	err = cmd.ExecuteCmdShowOutput()
+	errout = cmd.GetStdErr()
+	if err != nil || errout != "" {
+		fmt.Println("in error")
+		return fmt.Errorf("%s", errout)
 	}
 	return nil
 }
 
 func (cu *KubeCloudInstTool) makemasterready() error {
+	time.Sleep(1 * time.Second)
 	cmd := &Command{Cmd: exec.Command("sh", "-c", "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml")}
 	err := cmd.ExecuteCmdShowOutput()
 	errout := cmd.GetStdErr()
@@ -346,7 +419,7 @@ func (cu *KubeCloudInstTool) makemasterready() error {
 func (cu *KubeCloudInstTool) removenoscheduletaint() error {
 	//cmd := &Command{Cmd: exec.Command("sh", "-c", "hostname")}
 	//err := cmd.ExecuteCmdShowOutput()
-	masternode := "linux-40751"
+	masternode := hostname
 	fmt.Printf("master : %s", masternode)
 	cmd := &Command{Cmd: exec.Command("sh", "-c", fmt.Sprintf("kubectl taint nodes %s node-role.kubernetes.io/master:NoSchedule-", masternode))}
 	err := cmd.ExecuteCmdShowOutput()
@@ -375,7 +448,7 @@ func (cu *KubeCloudInstTool) applynode() error {
 
 func (cu *KubeCloudInstTool) applylabel() error {
 	//cmd := &Command{Cmd: exec.Command("sh", "-c", "hostname")}
-	masternode := "linux-40751"
+	masternode := hostname
 
 	cmd := &Command{Cmd: exec.Command("sh", "-c", fmt.Sprintf("kubectl label nodes %s dedicated=master", masternode))}
 	err := cmd.ExecuteCmdShowOutput()
@@ -401,9 +474,9 @@ func (cu *KubeCloudInstTool) applylabel() error {
 func (cu *KubeCloudInstTool) copydata() error {
 	var cmd *Command
 	if _, err := os.Stat("/etc/kubeedge/data"); os.IsNotExist(err) {
-		cmd = &Command{Cmd: exec.Command("sh", "-c", "cp -r /home/src/fr_demo/demo/data /etc/kubeedge")}
+		cmd = &Command{Cmd: exec.Command("sh", "-c", "cp -rf /home/src/fr_demo/demo/data /etc/kubeedge")}
 	}else {
-		cmd = &Command{Cmd: exec.Command("sh", "-c", "rm -rf /etc/kubeedge/data && cp -r /home/src/fr_demo/demo/data /etc/kubeedge")}
+		cmd = &Command{Cmd: exec.Command("sh", "-c", "rm -rf /etc/kubeedge/data && cp -rf /home/src/fr_demo/demo/data /etc/kubeedge")}
 	}
 	err := cmd.ExecuteCmdShowOutput()
 	errout := cmd.GetStdErr()
