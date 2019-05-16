@@ -83,12 +83,12 @@ func (cu *KubeCloudInstTool) InstallTools() error {
 	}
 	fmt.Println("removenoscheduletaint")
 
-	time.Sleep(1 * time.Second)
-	err = cu.RunEdgeController()
-	if err != nil {
-		return err
-	}
-	fmt.Println("Edgecontroller started")
+	//time.Sleep(1 * time.Second)
+	//err = cu.RunEdgeController()
+	//if err != nil {
+	//	return err
+	//}
+	//fmt.Println("Edgecontroller started")
 
 	err=cu.applynode()
 	if err != nil {
@@ -111,11 +111,11 @@ func (cu *KubeCloudInstTool) InstallTools() error {
 	}
 	fmt.Println("copydata")
 
-	err=cu.buildimage()
-	if err != nil {
-		return err
-	}
-	fmt.Println("buildimage")
+	//err=cu.buildimage()
+	//if err != nil {
+	//	return err
+	//}
+	//fmt.Println("buildimage")
 
 	return nil
 }
