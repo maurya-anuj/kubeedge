@@ -192,7 +192,7 @@ func (cu *KubeCloudInstTool)cloningdemo() error {
 	//
 	//}
 	//
-	//return nil
+	return nil
 }
 
 func (cu *KubeCloudInstTool)copycerts() error {
@@ -341,7 +341,7 @@ func (cu *KubeCloudInstTool) RunEdgeController() error {
 
 	}
 
-	binExec := fmt.Sprintf("chmod +x /home/src/github.com/kubeedge/kubeedge/cloud/%s && %s > /home/src/github.com/kubeedge/kubeedge/cloud/%s.log 2>&1 &", KubeCloudBinaryName, KubeCloudBinaryName,  KubeCloudBinaryName)
+	binExec := fmt.Sprintf("chmod +x /home/src/github.com/kubeedge/kubeedge/cloud/%s && /home/src/github.com/kubeedge/kubeedge/cloud/%s > /home/src/github.com/kubeedge/kubeedge/cloud/%s.log 2>&1 &", KubeCloudBinaryName, KubeCloudBinaryName,  KubeCloudBinaryName)
 	cmd = &Command{Cmd: exec.Command("sh", "-c", binExec)}
 	cmd.Cmd.Env = os.Environ()
 	env := fmt.Sprintf("GOARCHAIUS_CONFIG_PATH=%skubeedge/cloud", KubeEdgePath)
