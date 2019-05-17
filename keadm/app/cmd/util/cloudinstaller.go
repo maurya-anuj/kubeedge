@@ -396,7 +396,7 @@ func (cu *KubeCloudInstTool) xhostandhostname() error {
 
 func (cu *KubeCloudInstTool) makemasterready() error {
 	time.Sleep(1 * time.Second)
-	cmd := &Command{Cmd: exec.Command("sh", "-c", "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml")}
+	cmd := &Command{Cmd: exec.Command("sh", "-c", "kubectl apply -f /home/src/fr_demo/kube-flannel.yml")}
 	err := cmd.ExecuteCmdShowOutput()
 	errout := cmd.GetStdErr()
 	if err != nil || errout != "" {
@@ -405,7 +405,7 @@ func (cu *KubeCloudInstTool) makemasterready() error {
 
 	}
 	time.Sleep(5 * time.Second)
-	cmd = &Command{Cmd: exec.Command("sh", "-c", "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml")}
+	cmd = &Command{Cmd: exec.Command("sh", "-c", "kubectl apply -f /home/src/fr_demo/kube-flannel-rbac.yml")}
 	err = cmd.ExecuteCmdShowOutput()
 	errout = cmd.GetStdErr()
 	if err != nil || errout != "" {
