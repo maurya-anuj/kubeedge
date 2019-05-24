@@ -7,6 +7,7 @@ import (
 	"github.com/kubeedge/kubeedge/cloud/pkg/controller/manager"
 	"github.com/kubeedge/kubeedge/cloud/pkg/controller/messagelayer"
 	"github.com/kubeedge/kubeedge/cloud/pkg/controller/utils"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -194,7 +195,9 @@ func (dc *DownstreamController) Stop() error {
 
 // initLocating to know configmap and secret should send to which nodes
 func (dc *DownstreamController) initLocating() error {
-	pods, err := dc.kubeClient.CoreV1().Pods(v1.NamespaceAll).List(metav1.ListOptions{})
+	set := labels.Set{"name":"edge-node"}
+	selector := labels.SelectorFromSet(set)
+	pods, err := dc.kubeClient.CoreV1().Pods(v1.NamespaceAll).List(metav1.ListOptions{LabelSelector:selector.String()})
 	if err != nil {
 		return err
 	}

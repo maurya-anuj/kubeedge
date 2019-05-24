@@ -7,7 +7,7 @@ import (
 	"github.com/kubeedge/beehive/pkg/common/log"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -79,11 +79,17 @@ func (pm *PodManager) Events() chan watch.Event {
 
 // NewPodManager create PodManager from config
 func NewPodManager(kubeClient *kubernetes.Clientset, namespace string) (*PodManager, error) {
-	lw := cache.NewListWatchFromClient(kubeClient.CoreV1().RESTClient(), "pods", namespace, fields.Everything())
+	set := labels.Set{"name":"edge-node"}
+	selector := labels.SelectorFromSet(set)
+	optionModifier := func(options *metav1.ListOptions) {
+		options.LabelSelector = selector.String()
+	}
+	listwatcher := cache.NewFilteredListWatchFromClient(kubeClient.CoreV1().RESTClient(), "pods", namespace, optionModifier)
+	// lw := cache.NewListWatchFromClient(kubeClient.CoreV1().RESTClient(), "pods", namespace, selector)
 	realEvents := make(chan watch.Event)
 	mergedEvents := make(chan watch.Event)
 	rh := NewCommonResourceEventHandler(realEvents)
-	si := cache.NewSharedInformer(lw, &v1.Pod{}, 0)
+	si := cache.NewSharedInformer(listwatcher, &v1.Pod{}, 0)
 	si.AddEventHandler(rh)
 
 	pm := &PodManager{realEvents: realEvents, mergedEvents: mergedEvents}
