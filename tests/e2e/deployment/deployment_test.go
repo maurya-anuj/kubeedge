@@ -300,8 +300,9 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			utils.CheckPodRunningState(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, podlist)
 			utils.Info("\n Server app deployed \n")
 
+			serviceName := "pod-app-server"
 			// Deploy service over the server pod
-			err = utils.ExposePodService(UIDServer, ctx.Cfg.K8SMasterForKubeEdge+ServiceHandler, 80, intstr.FromInt(8000), metav1.ServiceTypeClusterIP)
+			err = utils.ExposePodService(serviceName, ctx.Cfg.K8SMasterForKubeEdge+ServiceHandler, 80, intstr.FromInt(8000), metav1.ServiceTypeClusterIP)
 			Expect(err).To(BeNil())
 			err = utils.GetServices(&servicelist, ctx.Cfg.K8SMasterForKubeEdge+ServiceHandler)
 			Expect(err).To(BeNil())
