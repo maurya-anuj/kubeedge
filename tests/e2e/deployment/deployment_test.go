@@ -35,6 +35,7 @@ const (
 	NodeHandler       = "/api/v1/nodes"
 	DeploymentHandler = "/apis/apps/v1/namespaces/default/deployments"
 	ServiceHandler    = "/api/v1/namespaces/default/services"
+	EndpointHandler   = "/api/v1/namespaces/default/endpoints"
 )
 
 var DeploymentTestTimerGroup *utils.TestTimerGroup = utils.NewTestTimerGroup()
@@ -309,7 +310,10 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 
 			// Check server app is accessible with default value
 			time.Sleep(time.Second * 5)
-			Expect(utils.Getname("http://192.168.20.62:8000")).To(BeEquivalentTo("Default"))
+
+			err, ep := utils.GetServiceEndpoint(ctx.Cfg.K8SMasterForKubeEdge+EndpointHandler + "/" + serviceName)
+			utils.Info("ep %s", ep)
+			// Expect(utils.Getname(ep)).To(BeEquivalentTo("Default"))
 
 			UIDClient = "pod-app-client" + utils.GetRandomString(5)
 			depobj = utils.CreateDeployment(UIDClient, ctx.Cfg.AppImageUrl[3], nodeSelector, 1, map[string]string{"app": "client"}, 81)
@@ -326,7 +330,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 					break
 				}
 			}
-			time.Sleep(time.Second * 60)
+			time.Sleep(time.Second * 600)
 			// Check weather the name variable is changed in server
 			Expect(utils.Getname("http://192.168.20.62:8000")).To(BeEquivalentTo("Changed"))
 		})

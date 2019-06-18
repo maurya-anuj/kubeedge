@@ -19,10 +19,12 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -615,11 +617,54 @@ func CreateDeployment(name, imgUrl, selector string, replicas int, label map[str
 							Ports: []v1.ContainerPort{{HostPort: port, ContainerPort: port}},
 						},
 					},
-					HostNetwork: true,
+					HostNetwork:  true,
 					NodeSelector: nodeselector,
+					DNSPolicy:    v1.DNSDefault,
 				},
 			},
 		},
 	}
 	return &deployment
+}
+
+//GetServiceEndpoint function to get the service endpoints created for deployment.
+func GetServiceEndpoint(endpointHandler string) (error, string) {
+	var endpoints v1.Endpoints
+	var port string
+	var add string
+	// var wssport, quicport int32
+	err, resp := SendHttpRequest(http.MethodGet, endpointHandler)
+	if err != nil {
+		// handle error
+		Failf("HTTP request is failed :%v", err)
+		return err, ""
+	}
+
+	contents, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		Failf("HTTP Response reading has failed: %v", err)
+		return err, ""
+	}
+
+	err = json.Unmarshal(contents, &endpoints)
+	fmt.Printf("\n endpoints list : %+v \n", endpoints)
+	if err != nil {
+		Failf("Unmarshal HTTP Response has failed: %v", err)
+		return err, ""
+	}
+	defer resp.Body.Close()
+
+	for _, ep := range endpoints.Subsets {
+		for _, ip := range ep.Addresses {
+			add = ip.IP
+		}
+		for _, ports := range ep.Ports {
+			portInt := ports.Port
+			port = strconv.FormatInt(int64(portInt), 10)
+		}
+	}
+
+	url := "http://" + add + ":" + port
+
+	return nil, url
 }
