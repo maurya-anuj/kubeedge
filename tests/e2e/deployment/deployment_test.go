@@ -308,6 +308,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			Expect(err).To(BeNil())
 
 			// Check server app is accessible with default value
+			time.Sleep(time.Second * 5)
 			Expect(utils.Getname("http://192.168.20.62:8000")).To(BeEquivalentTo("Default"))
 
 			UIDClient = "pod-app-client" + utils.GetRandomString(5)
