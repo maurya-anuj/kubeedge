@@ -498,7 +498,7 @@ func CreatePodService(name string, port int32, targetport intstr.IntOrString, se
 
 	Service := v1.Service{
 		TypeMeta:   metav1.TypeMeta{APIVersion: "v1", Kind: "Service"},
-		ObjectMeta: metav1.ObjectMeta{Name: name, Labels: ServiceLabel},
+		ObjectMeta: metav1.ObjectMeta{Name: name, Labels: ServiceLabel, Namespace: Namespace},
 
 		Spec: v1.ServiceSpec{
 			Ports:    portInfo,
@@ -615,6 +615,7 @@ func CreateDeployment(name, imgUrl, selector string, replicas int, label map[str
 							Ports: []v1.ContainerPort{{HostPort: port, ContainerPort: port}},
 						},
 					},
+					HostNetwork: true,
 					NodeSelector: nodeselector,
 				},
 			},

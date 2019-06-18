@@ -31,7 +31,7 @@ cd ../
 cat >config.json<<END
 {
         "image_url": ["nginx", "hello-world", "anujmaurya/server:v1.0", "anujmaurya/client:v1.1"],
-        "k8smasterforkubeedge":"http://$MASTER_IP:12418"
+        "k8smasterforkubeedge":"http://$MASTER_IP:12339"
 }
 END
 
