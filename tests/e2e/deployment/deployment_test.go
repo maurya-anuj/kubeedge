@@ -308,7 +308,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			Expect(err).To(BeNil())
 
 			// Check server app is accessible with default value
-			// Expect(utils.Getname("http://localhost:8000")).To(BeEquivalentTo("Default"))
+			Expect(utils.Getname("http://192.168.20.62:8000")).To(BeEquivalentTo("Default"))
 
 			UIDClient = "pod-app-client" + utils.GetRandomString(5)
 			depobj = utils.CreateDeployment(UIDClient, ctx.Cfg.AppImageUrl[3], nodeSelector, 1, map[string]string{"app": "client"}, 81)
@@ -327,7 +327,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			}
 			time.Sleep(time.Second * 60)
 			// Check weather the name variable is changed in server
-			Expect(utils.Getname("http://localhost:8000")).To(BeEquivalentTo("Changed"))
+			Expect(utils.Getname("http://192.168.20.62:8000")).To(BeEquivalentTo("Changed"))
 		})
 
 		It("E2E_SERVICE_EDGEMESH_2: Client pod restart: POSITIVE", func() {
