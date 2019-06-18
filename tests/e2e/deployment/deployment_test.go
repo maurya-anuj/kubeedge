@@ -325,7 +325,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 					break
 				}
 			}
-			time.Sleep(time.Second * 3000)
+			time.Sleep(time.Second * 60)
 			// Check weather the name variable is changed in server
 			Expect(utils.Getname("http://localhost:8000")).To(BeEquivalentTo("Changed"))
 		})

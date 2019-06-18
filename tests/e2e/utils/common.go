@@ -502,7 +502,7 @@ func CreatePodService(name string, port int32, targetport intstr.IntOrString, se
 
 		Spec: v1.ServiceSpec{
 			Ports:    portInfo,
-			Selector: map[string]string{"app": "nginx"},
+			Selector: map[string]string{"app": "server"},
 			Type:     serviceType,
 		},
 	}
