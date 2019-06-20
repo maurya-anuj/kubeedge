@@ -414,7 +414,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			if err != nil {
 				panic(err)
 			}
-			time.Sleep(time.Second * 2)
+			podlist = metav1.PodList{}
 			//deployment will restart it check again pod is there
 			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app"+"%3D"+"client", "")
 			Expect(err).To(BeNil())
@@ -497,7 +497,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 					}
 				}
 			}
-
+			podlist = metav1.PodList{}
 			//deployment will restart it check again pod is there
 			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app"+"%3D"+"server", "")
 			Expect(err).To(BeNil())
@@ -581,6 +581,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			time.Sleep(time.Second * 1)
 			err = utils.GetDeployments(&deploymentList, ctx.Cfg.K8SMasterForKubeEdge+DeploymentHandler+utils.LabelSelector+"app%3Dkubeedge")
 			Expect(err).To(BeNil())
+			podlist = metav1.PodList{}
 			for _, deployment := range deploymentList.Items {
 				if deployment.Name == UIDServer {
 					label := nodeName
