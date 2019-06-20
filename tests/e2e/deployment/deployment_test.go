@@ -509,6 +509,8 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			_, ep = utils.GetServiceEndpoint(ctx.Cfg.K8SMasterForKubeEdge + EndpointHandler + "/" + serviceName)
 			utils.Info("ep %s", ep)
 
+			//time delay for next name change request by client pod
+			time.Sleep(time.Second * 5)
 			//check the name is changed of not
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
 		})
@@ -660,7 +662,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
 
 			//delete service
-			StatusCode := utils.DeleteSvc(ctx.Cfg.K8SMasterForKubeEdge + ServiceHandler + "/" + UIDServer)
+			StatusCode := utils.DeleteSvc(ctx.Cfg.K8SMasterForKubeEdge + ServiceHandler + "/" + serviceName)
 			Expect(StatusCode).Should(Equal(http.StatusOK))
 
 			// Check endpoints created
