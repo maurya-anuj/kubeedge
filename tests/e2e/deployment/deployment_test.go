@@ -313,7 +313,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 
 			err, ep := utils.GetServiceEndpoint(ctx.Cfg.K8SMasterForKubeEdge+EndpointHandler + "/" + serviceName)
 			utils.Info("ep %s", ep)
-			// Expect(utils.Getname(ep)).To(BeEquivalentTo("Default"))
+			Expect(utils.Getname(ep)).To(BeEquivalentTo("Default"))
 
 			UIDClient = "pod-app-client" + utils.GetRandomString(5)
 			depobj = utils.CreateDeployment(UIDClient, ctx.Cfg.AppImageUrl[3], nodeSelector, 1, map[string]string{"app": "client"}, 81)

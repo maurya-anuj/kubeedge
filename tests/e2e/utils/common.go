@@ -617,7 +617,6 @@ func CreateDeployment(name, imgUrl, selector string, replicas int, label map[str
 							Ports: []v1.ContainerPort{{HostPort: port, ContainerPort: port}},
 						},
 					},
-					HostNetwork:  true,
 					NodeSelector: nodeselector,
 					DNSPolicy:    v1.DNSDefault,
 				},
