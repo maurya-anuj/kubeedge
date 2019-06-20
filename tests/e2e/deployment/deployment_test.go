@@ -35,7 +35,7 @@ const (
 	NodeHandler       = "/api/v1/nodes"
 	DeploymentHandler = "/apis/apps/v1/namespaces/default/deployments"
 	ServiceHandler    = "/api/v1/namespaces/default/services"
-	EndpointHandler   = "/api/v1/namespaces/default/endpoints"
+	EndpointHandler = "/api/v1/namespaces/default/endpoints"
 )
 
 var DeploymentTestTimerGroup *utils.TestTimerGroup = utils.NewTestTimerGroup()
@@ -309,9 +309,9 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			Expect(err).To(BeNil())
 
 			// Check server app is accessible with default value
-			time.Sleep(time.Second * 5)
+			utils.CheckEndpointCreated(ctx.Cfg.K8SMasterForKubeEdge+EndpointHandler, serviceName)
 
-			err, ep := utils.GetServiceEndpoint(ctx.Cfg.K8SMasterForKubeEdge+EndpointHandler + "/" + serviceName)
+			_, ep := utils.GetServiceEndpoint(ctx.Cfg.K8SMasterForKubeEdge+EndpointHandler + "/" + serviceName)
 			utils.Info("ep %s", ep)
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Default"))
 
@@ -319,20 +319,20 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			depobj = utils.CreateDeployment(UIDClient, ctx.Cfg.AppImageUrl[3], nodeSelector, 1, map[string]string{"app": "client"}, 81)
 			IsAppDeployed = utils.HandleRequest(http.MethodPost, ctx.Cfg.K8SMasterForKubeEdge+DeploymentHandler, UIDClient, depobj)
 			Expect(IsAppDeployed).Should(BeTrue())
+			time.Sleep(time.Second * 1)
 			err = utils.GetDeployments(&deploymentList, ctx.Cfg.K8SMasterForKubeEdge+DeploymentHandler+utils.LabelSelector+"app%3Dkubeedge")
 			Expect(err).To(BeNil())
 			for _, deployment := range deploymentList.Items {
 				if deployment.Name == UIDClient {
-					label := nodeName
-					podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, label)
+					// label := nodeName
+					podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app%3Dclient", "")
 					Expect(err).To(BeNil())
-					utils.CheckPodRunningState(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, podlist)
 					break
 				}
 			}
-			time.Sleep(time.Second * 600)
+			utils.CheckPodRunningState(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, podlist)
 			// Check weather the name variable is changed in server
-			Expect(utils.Getname("http://192.168.20.62:8000")).To(BeEquivalentTo("Changed"))
+			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
 		})
 
 		It("E2E_SERVICE_EDGEMESH_2: Client pod restart: POSITIVE", func() {

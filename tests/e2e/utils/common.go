@@ -39,8 +39,8 @@ import (
 )
 
 const (
-	Namespace     = "default"
-	LabelSelector = "?labelSelector="
+	Namespace       = "default"
+	LabelSelector   = "?labelSelector="
 )
 
 var (
@@ -662,7 +662,20 @@ func GetServiceEndpoint(endpointHandler string) (error, string) {
 		}
 	}
 
+	if add == "" || port == ""{
+		return fmt.Errorf("endpoints not created"), ""
+	}
+
 	url := "http://" + add + ":" + port
 
 	return nil, url
+}
+
+//CheckEndpointCreated function to check the and get the endpoints
+func CheckEndpointCreated(apiserver, serviceName string) {
+	Eventually(func() error {
+		err, _ := GetServiceEndpoint(apiserver + "/" + serviceName)
+		Info("error : %e", err)
+		return err
+	}, "120s", "2s").Should(BeNil(), "Endpoint creation is unsuccessfull, endpoints not recieved")
 }
