@@ -417,7 +417,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			podlist = metav1.PodList{}
 			time.Sleep(time.Second * 2)
 			//deployment will restart it check again pod is there
-			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app"+"%3D"+"client", "")
+			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, "")
 			Expect(err).To(BeNil())
 			utils.CheckPodRunningState(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, podlist)
 
