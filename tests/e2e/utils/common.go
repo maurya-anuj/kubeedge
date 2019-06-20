@@ -618,7 +618,6 @@ func CreateDeployment(name, imgUrl, selector string, replicas int, label map[str
 						},
 					},
 					NodeSelector: nodeselector,
-					DNSPolicy:    v1.DNSDefault,
 				},
 			},
 		},
