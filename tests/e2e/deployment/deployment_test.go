@@ -414,7 +414,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			if err != nil {
 				panic(err)
 			}
-
+			time.Sleep(time.Second * 2)
 			//deployment will restart it check again pod is there
 			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app"+"%3D"+"client", "")
 			Expect(err).To(BeNil())
