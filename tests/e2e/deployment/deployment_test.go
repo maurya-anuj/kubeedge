@@ -388,7 +388,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			utils.Info("\n Client app deployed \n")
 
 			//check name changed(communication happened)
-			Expect(utils.Getname("http://localhost:8000")).To(BeEquivalentTo("Default"))
+			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
 
 			//delete client
 			err = utils.GetDeployments(&deploymentList, ctx.Cfg.K8SMasterForKubeEdge+DeploymentHandler+utils.LabelSelector+"app%3Dkubeedge")
@@ -409,7 +409,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			}
 
 			//change the name back to default again
-			var jsonStr = []byte("Changed")
+			var jsonStr = []byte("Default")
 			_, err = http.Post(ep, "application/json", bytes.NewBuffer(jsonStr))
 			if err != nil {
 				panic(err)
@@ -479,7 +479,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			utils.Info("\n Client app deployed \n")
 
 			//check name changed(communication happened)
-			Expect(utils.Getname(ep)).To(BeEquivalentTo("Default"))
+			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
 
 			///delete server pod
 			err = utils.GetDeployments(&deploymentList, ctx.Cfg.K8SMasterForKubeEdge+DeploymentHandler+utils.LabelSelector+"app%3Dkubeedge")
@@ -656,7 +656,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			utils.Info("\n Client app deployed \n")
 
 			//check name changed(communication happened)
-			Expect(utils.Getname(ep)).To(BeEquivalentTo("Default"))
+			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
 
 			//delete service
 			StatusCode := utils.DeleteSvc(ctx.Cfg.K8SMasterForKubeEdge + ServiceHandler + "/" + UIDServer)
@@ -669,7 +669,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			utils.Info("ep %s", ep)
 
 			//change the name back to default again
-			var jsonStr = []byte("Changed")
+			var jsonStr = []byte("Default")
 			_, err = http.Post(ep, "application/json", bytes.NewBuffer(jsonStr))
 			if err != nil {
 				panic(err)
