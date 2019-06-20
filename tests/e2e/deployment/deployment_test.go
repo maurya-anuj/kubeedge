@@ -333,7 +333,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
 		})
 
-		It("E2E_SERVICE_EDGEMESH_2: Client pod restart: POSITIVE", func() {
+		FIt("E2E_SERVICE_EDGEMESH_2: Client pod restart: POSITIVE", func() {
 			var podlist metav1.PodList
 			var deploymentList v1.DeploymentList
 			var servicelist metav1.ServiceList
@@ -424,7 +424,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
 		})
 
-		It("E2E_SERVICE_EDGEMESH_3: Server pod restart: POSITIVE", func() {
+		FIt("E2E_SERVICE_EDGEMESH_3: Server pod restart: POSITIVE", func() {
 			var podlist metav1.PodList
 			var deploymentList v1.DeploymentList
 			var servicelist metav1.ServiceList
@@ -513,7 +513,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
 		})
 
-		It("E2E_SERVICE_EDGEMESH_4: Server deployment gets deleted: FAILURE", func() {
+		FIt("E2E_SERVICE_EDGEMESH_4: Server deployment gets deleted: FAILURE", func() {
 			var podlist metav1.PodList
 			var deploymentList v1.DeploymentList
 			var servicelist metav1.ServiceList
@@ -601,7 +601,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Default"))
 		})
 
-		It("E2E_SERVICE_EDGEMESH_5: delete service : FAILURE", func() {
+		FIt("E2E_SERVICE_EDGEMESH_5: delete service : FAILURE", func() {
 			var podlist metav1.PodList
 			var deploymentList v1.DeploymentList
 			var servicelist metav1.ServiceList
@@ -679,7 +679,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Default"))
 		})
 
-		It("E2E_SERVICE_EDGEMESH_6: create Loadbalancer service : FAILURE", func() {
+		FIt("E2E_SERVICE_EDGEMESH_6: create Loadbalancer service : FAILURE", func() {
 			var podlist metav1.PodList
 			var deploymentList v1.DeploymentList
 			var servicelist metav1.ServiceList
