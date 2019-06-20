@@ -418,7 +418,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			//deployment will restart it check again pod is there
 			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app"+"%3D"+"client", "")
 			Expect(err).To(BeNil())
-			utils.CheckPodRunningState(ctx.Cfg.K8SMasterForKubeEdge, podlist)
+			utils.CheckPodRunningState(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, podlist)
 
 			//check the name is changed of not
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
@@ -501,7 +501,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 			//deployment will restart it check again pod is there
 			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app"+"%3D"+"server", "")
 			Expect(err).To(BeNil())
-			utils.CheckPodRunningState(ctx.Cfg.K8SMasterForKubeEdge, podlist)
+			utils.CheckPodRunningState(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, podlist)
 
 			// Check endpoints created
 			utils.CheckEndpointCreated(ctx.Cfg.K8SMasterForKubeEdge+EndpointHandler, serviceName)
