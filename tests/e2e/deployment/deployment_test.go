@@ -415,6 +415,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 				panic(err)
 			}
 			podlist = metav1.PodList{}
+			time.Sleep(time.Second * 1)
 			//deployment will restart it check again pod is there
 			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app"+"%3D"+"client", "")
 			Expect(err).To(BeNil())
@@ -498,6 +499,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 				}
 			}
 			podlist = metav1.PodList{}
+			time.Sleep(time.Second * 1)
 			//deployment will restart it check again pod is there
 			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app"+"%3D"+"server", "")
 			Expect(err).To(BeNil())
