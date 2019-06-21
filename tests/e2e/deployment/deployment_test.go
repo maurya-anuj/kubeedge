@@ -404,6 +404,7 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 							_, StatusCode := utils.DeletePods(ctx.Cfg.K8SMasterForKubeEdge + AppHandler + "/" + pod.Name)
 							Expect(StatusCode).Should(Equal(http.StatusOK))
 						}
+						utils.CheckPodDeleteState(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, podlist)
 					}
 				}
 			}
@@ -415,11 +416,13 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 				panic(err)
 			}
 			podlist = metav1.PodList{}
-			time.Sleep(time.Second * 2)
 			//deployment will restart it check again pod is there
 			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, "")
 			Expect(err).To(BeNil())
 			utils.CheckPodRunningState(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, podlist)
+
+			//time delay for next name change request by client pod
+			time.Sleep(time.Second * 5)
 
 			//check the name is changed of not
 			Expect(utils.Getname(ep)).To(BeEquivalentTo("Changed"))
@@ -495,11 +498,11 @@ var _ = Describe("Application deployment test in E2E scenario", func() {
 							_, StatusCode := utils.DeletePods(ctx.Cfg.K8SMasterForKubeEdge + AppHandler + "/" + pod.Name)
 							Expect(StatusCode).Should(Equal(http.StatusOK))
 						}
+						utils.CheckPodDeleteState(ctx.Cfg.K8SMasterForKubeEdge+AppHandler, podlist)
 					}
 				}
 			}
 			podlist = metav1.PodList{}
-			time.Sleep(time.Second * 2)
 			//deployment will restart it check again pod is there
 			podlist, err = utils.GetPods(ctx.Cfg.K8SMasterForKubeEdge+AppHandler+utils.LabelSelector+"app"+"%3D"+"server", "")
 			Expect(err).To(BeNil())
